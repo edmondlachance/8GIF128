@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>DOM</title>
+<style type="text/css">
+body {
+}
+#conteneur {
+  display: block;
+  padding: 10px;
+  clear: both;
+  position: relative;
+  height: auto;
+}
+#conteneur div {
+  display: block;
+  border: solid 1px;
+  width: 80px;
+  height: 80px;
+  padding: 10px;
+  margin: 10px;
+  float: left;
+}
+
+#jaune {
+  background: yellow;
+}
+
+#bleu {
+  background: blue;
+}
+
+#vert {
+  background: green;
+}
+</style>
+<script type="text/javascript">
+//<![CDATA[
+
+function test_append_child()
+{
+  var p = document.getElementById("conteneur");
+  var e1 = document.getElementById("jaune");
+  var e2 = e1.cloneNode(true);
+  p.appendChild(e2);
+}
+
+function test_insert_before()
+{
+  var p = document.getElementById("conteneur");
+  var e_bleu = document.getElementById("bleu");
+  var e = document.getElementById("jaune");
+  var e_jaune = e.cloneNode(true);
+  p.insertBefore(e_jaune, e_bleu);
+}
+
+function test_remove_child()
+{
+  var p = document.getElementById("conteneur");
+  var e_bleu = document.getElementById("bleu");
+  var e = document.getElementById("jaune");
+  p.removeChild(e);
+}
+
+function test_replace_child()
+{
+  var p = document.getElementById("conteneur");
+  var e_bleu = document.getElementById("bleu");
+  var e = document.getElementById("jaune").cloneNode(true);
+  p.replaceChild(e, e_bleu);
+}
+
+
+//]]>
+</script>
+</head>
+<body>
+<div id="conteneur">
+
+<div id="jaune">La div 1</div>
+<div id="bleu">La div 2</div>
+<div id="vert">La div 3</div>
+
+</div>
+
+<div style="clear:both"/>
+
+<p onclick="javascript:test_append_child();">Cliquer ici pour appeler appendChild</p>
+
+<p onclick="javascript:test_insert_before();">Cliquer ici pour appeler insertBefore</p>
+
+<p onclick="javascript:test_remove_child();">Cliquer ici pour appeler removeChild</p>
+
+<p onclick="javascript:test_replace_child();">Cliquer ici pour appeler replaceChild</p>
+</body>
+</html>

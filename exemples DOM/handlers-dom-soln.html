@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>DOM</title>
+<script type="text/javascript">
+//<![CDATA[
+function enrouge(i)
+{
+  e = document.getElementById(i);
+  if (e.style.color == "black" || e.style.color == "")
+    e.style.color = "red";
+  else
+    e.style.color = "black";
+}
+
+//]]>
+</script>
+</head>
+<body>
+
+<h1>Faire passer au rouge</h1>
+
+<ul>
+
+<li id="item1" onclick="enrouge('item1');">Item 1</li>
+<li id="item2" onclick="enrouge('item2');">Item 2</li>
+<li id="item3" onclick="enrouge('item3');">Item 3</li>
+
+</ul>
+
+</body>
+</html>
