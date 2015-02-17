@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>websocket graph gen example</title>
+    <style>
+      #count {
+        font: bold 150px arial;
+        margin: auto;
+        padding: 10px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div id="count"></div>
+
+<p> Sommets: <input id="sommets" name="sommets"> </p>
+<p> Densite: <input id="densite" name="densite">  </p>
+<input id="gen" name="Generer" type="submit" value="Generer" onclick="go()">
+
+    <script>
+
+    function go()
+    {
+      var sommets = document.getElementById('sommets').value;
+      var densite = document.getElementById('densite').value;
+
+      console.log(sommets + " " + densite);
+
+      var ws = new WebSocket('ws://localhost:8080/');
+
+      //We have to wait for the socket to be opened to use SEND
+      ws.onopen = function() {
+        console.log("Opening connection");
+
+        ws.send(sommets + " " + densite);
+
+        document.body.innerHTML = document.body.innerHTML + '<p> Open </p>';
+
+      };
+      ws.onclose = function() {
+        console.log("Closing connection");
+        document.body.style.backgroundColor = null;
+      };
+      ws.onmessage = function(event) {
+
+          console.log("Incoming data from websocket");
+          document.body.innerHTML = document.body.innerHTML + event.data;
+      };
+
+    }
+
+     
+    </script>
+
+  </body>
+</html>
