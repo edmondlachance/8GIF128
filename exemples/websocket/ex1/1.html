@@ -16,16 +16,27 @@
     <div id="count"></div>
 
     <script>
+
+      //synchrone
       var ws = new WebSocket('ws://localhost:8080/');
+      var count = 1;
+
+      //asynchrone
       ws.onopen = function() {
         document.body.style.backgroundColor = '#cfc';
+        console.log("Socket ouvert");
       };
       ws.onclose = function() {
         document.body.style.backgroundColor = null;
+        console.log("Socket ferme");
       };
       ws.onmessage = function(event) {
+        console.log("message :" + count);
+        count++;
+
         document.getElementById('count').textContent = event.data;
       };
+
     </script>
 
   </body>
