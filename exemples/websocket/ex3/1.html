@@ -22,8 +22,6 @@
     <div id="count"></div>
 
 <div id='formulaire'>
-<p> Sommets: <input id="sommets" name="sommets"> </p>
-<p> Densite: <input id="densite" name="densite">  </p>
 <input id="gen" name="Generer" type="submit" value="Generer" onclick="go()" />
 </div>
     
@@ -31,47 +29,28 @@
 
     function go()
     {
-      //Variables locales a la fonction
-      var sommets = document.getElementById('sommets').value;
-      var densite = document.getElementById('densite').value;
-
       //Variables d'objet, disponibles de l'extérieur
-      this.count = 1;
       this.graph = new Springy.Graph();
       this.springy = 0;
       this.json = 0;
-
-      console.log(sommets + " " + densite);
 
       //Création d'un lien vers un websocket qui écoute sur le port 8080
       var ws = new WebSocket('ws://localhost:8080/');
 
       //We have to wait for the socket to be opened to use SEND
       ws.onopen = function() {
-        count = 0;
         console.log("Opening connection");
-        ws.send(sommets + " " + densite);
-       // document.body.innerHTML = document.body.innerHTML + '<p> Open </p>';
-
       };
       ws.onclose = function() {
         console.log("Closing connection");
-       // document.body.style.backgroundColor = null;
       };
       ws.onmessage = function(event) {
-       // document.body.innerHTML = document.body.innerHTML + 'message#'+count+"<br/>";
-       // document.body.innerHTML = document.body.innerHTML + event.data + "<br/>";
-       // count++;
 
         json = JSON.parse(event.data);
         graph.loadJSON(json);
         springy = jQuery('#springydemo').springy({
         graph: graph
         });
-
-        var u = 2+2;
-        var u = 2+2;
-        var u = 2+2;
       };
 
     }

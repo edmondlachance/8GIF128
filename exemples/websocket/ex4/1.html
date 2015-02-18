@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>JSON to CString</title>
+
+  </head>
+  <body>
+
+<textarea id="json" name="json"></textarea>
+<input id="gen" name="Generer" type="submit" value="Generer" onclick="go()" />
+    
+<script>
+
+    function go()
+    {
+      //Création d'un lien vers un websocket qui écoute sur le port 8080
+      var s = document.getElementById("json").value;
+      var ws = new WebSocket('ws://localhost:8080/');
+
+      //We have to wait for the socket to be opened to use SEND
+      ws.onopen = function() {
+        console.log("Opening connection");
+        ws.send(s);
+      };
+      ws.onclose = function() {
+        console.log("Closing connection");
+      };
+      ws.onmessage = function(event) {
+
+        json = (event.data);
+        document.body.innerHTML += '<p>'+ json +'</p>' ;
+
+        }
+      
+
+    }
+
+    </script>
+
+  </body>
+</html>
