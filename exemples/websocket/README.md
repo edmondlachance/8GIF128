@@ -17,7 +17,10 @@ Les websockets sont une nouvelle technologie web pour le browser qui permet a Ja
 Pour plus de détails, lire 
 http://en.wikipedia.org/wiki/WebSocket
 
-Ensuite, pour utiliser cette technologie facilement, il y a ça :
+Voici un schéma illustrant la différence entre technologies
+
+![Alt text](http://orm-chimera-prod.s3.amazonaws.com/1230000000545/images/hpbn_1702.png) 
+
 Le projet Websocketd (Web Socket Daemon) permet de convertir des fichiers exécutables qui lisent stdin et écrivent sur stdout en mini-serveurs. Chaque fois qu'une requête est lancée, le daemon lance le processus
 http://websocketd.com/
 
@@ -40,3 +43,10 @@ Exemple simple de processus travailleur écrit en C :
 
     return 0;
     }
+
+Exemple d'application avec websockets plus riche :
+
+http://socket.io/
+
+
+
