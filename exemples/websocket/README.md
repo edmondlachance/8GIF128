@@ -26,6 +26,7 @@ http://websocketd.com/
 
 Exemple simple de processus travailleur écrit en C :
 
+```c
     #include <stdio.h>
     #include <windows.h>
 
@@ -43,10 +44,29 @@ Exemple simple de processus travailleur écrit en C :
 
     return 0;
     }
+```
 
 Exemple d'application avec websockets plus riche :
-
 http://socket.io/
+https://github.com/rauchg/chat-example
+
+```javascript
+var app = require('express')();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+app.get('/', function(req, res){
+res.sendFile(__dirname + '/index.html');
+});
+io.on('connection', function(socket){
+socket.on('chat message', function(msg){
+io.emit('chat message', msg);
+});
+});
+http.listen(3000, function(){
+console.log('listening on *:3000');
+});
+```
+
 
 
 
