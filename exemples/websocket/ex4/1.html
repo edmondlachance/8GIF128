@@ -3,37 +3,76 @@
   <head>
     <title>JSON to CString</title>
 
+     <style>
+    .rouge {
+      color: red;
+      font-weight: bold;
+    }
+
+     </style>
+
   </head>
   <body>
 
-<textarea id="json" name="json"></textarea>
-<input id="gen" name="Generer" type="submit" value="Generer" onclick="go()" />
+<p>
+<textarea id="json" name="json"   style="width: 300px; height: 150px;"></textarea>
+</p>
+
+<input id="gen" name="Generer" type="submit" value="1.Ouvrir websocket" onclick="creerSocket()" />
+
+
+<input id="envoyer" name="envoyer" type="submit" value="2.Envoyer valeurs" onclick="x.envoyer()" />
+
+
+<input id="close" name="close" type="submit" value="3.Fermer WebSocket" onclick="x.fermer()" />
+
     
 <script>
 
-    function go()
+
+    //Rappel : le mot clé this ne fonctionne que si la fonction est appelée avec le mot clé new !!!
+    //Si la fonction webchaussette n'est pas appelée de cette façon, alors this va mettre l'objet dans le scope global, c'est a dire window.ws, window.send_data, etc.
+
+    function webchaussette()
     {
       //Création d'un lien vers un websocket qui écoute sur le port 8080
-      var s = document.getElementById("json").value;
-      var ws = new WebSocket('ws://localhost:8080/');
+      this.ws = new WebSocket('ws://localhost:8080/');
 
       //We have to wait for the socket to be opened to use SEND
-      ws.onopen = function() {
+      this.ws.onopen = function() {
         console.log("Opening connection");
-        ws.send(s);
       };
-      ws.onclose = function() {
+      this.ws.onclose = function() {
         console.log("Closing connection");
       };
-      ws.onmessage = function(event) {
-
-        json = (event.data);
-        document.body.innerHTML += '<p>'+ json +'</p>' ;
-
+      this.ws.onmessage = function(event) {
+        console.log("Incoming data\n");
+        var json = (event.data);
+        document.body.innerHTML +='<p class="rouge">'+json+'</p>';
         }
-      
 
+        this.allo = function() { console.log("Allo")}
+
+      this.send_data = function(s)
+      {
+        this.ws.send(s);
+      }
+
+      this.envoyer =  function()
+      {
+          var s = document.getElementById("json").value;
+          this.send_data(s);
+      }
+      this.fermer = function()
+      {
+          this.ws.close();
+      }
     }
+
+    //Création de l'objet x, on peut ensuite appeler ses fonctions avec x.fermer()
+    //Il faut que l,objet soit créé avec new pour que le this fonctionne a l'intérieur de webchaussette().
+    var x = new webchaussette();
+
 
     </script>
 
