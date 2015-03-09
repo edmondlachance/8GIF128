@@ -9,3 +9,8 @@ https://docs.google.com/presentation/d/1M7uXtmq7k7waBcsVMy9qumn21Q4f3sQsN-UPu_hv
 
 Le miniquizz #2 est le 10 mars, (1 semaine avant la date d'abandon).
 Le miniquizz porte sur tout ce qu'on a vu depuis le dernier quizz. Les websockets, ajax, json et surtout le modèle Prototype de Javascript. Il est important de bien le comprendre. Aller voir les diapos et les commentaires des diapos. Bien comprendre comment fonctionne le mot clé this.
+
+Format du miniquizz. 
+Gros vrai ou faux (5 points)
+Compréhension de code (5 points)
+
