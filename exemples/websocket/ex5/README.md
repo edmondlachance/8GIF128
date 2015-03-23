@@ -16,4 +16,4 @@ http://www.cplusplus.com/reference/cstdio/gets/?kw=gets
 http://www.cplusplus.com/reference/vector/vector/resize/
 
 Exemple :
-![exemple](http://imgur.com/Lz6C5Az)
+![exemple](http://i.imgur.com/Lz6C5Az.png)
