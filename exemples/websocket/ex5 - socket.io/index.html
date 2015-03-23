@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<title>Parcours DFS</title>
+   <style>
+    .rouge {
+      color: red;
+      font-weight: bold;
+    }
+     </style>
+<script src="https://cdn.socket.io/socket.io-1.3.4.js"></script>
+
+<body>
+
+<p id="exemple">
+<strong>Exemple de fichier :</strong> 
+6
+0 1
+1 2
+2 3
+3 5
+3 4
+0 5
+5 4
+4 1
+3 6
+5 2
+#
+</p>
+
+<p>
+<textarea id="json" name="json"   style="width: 300px; height: 150px;"></textarea>
+</p>
+
+<input id="gen" name="Generer" type="submit" value="1.Ouvrir websocket" onclick="creerSocket()" />
+
+<input id="envoyer" name="envoyer" type="submit" value="2.Envoyer valeurs" onclick="envoyer()" />
+
+
+
+<div id="resultats">   </div>
+
+</body>
+
+<script>
+	
+	 var pp = document.querySelector("#exemple");
+     pp.innerHTML = pp.innerHTML.replace(/\n/g, "<br/>");
+
+  	 var resultats_node = document.querySelector("#resultats");
+  	 var socket;
+
+
+  	 function creerSocket() {
+  	 	  socket = io.connect('http://localhost:8070');
+
+  	 	socket.on('graph_json', function (data) {
+        console.log(data);
+
+        //var beaujson = JSON.stringify(data);
+       // beaujson = beaujson.replace(/\n/g, "<br/>");
+        //resultats_node.innerHTML += "<p>Graphe:"+ beaujson+"</p>";
+        });
+
+        socket.on('output', function (data) {
+        console.log(data);
+        data = data.replace(/\n/g, "<br/>");
+        resultats_node.innerHTML += "<p>Output DFS:<br/>"+ data+"</p>";
+        });
+
+  	 }
+
+  	 function envoyer() {
+
+  	 	//Check si le socket existe avant...
+  	 	if (typeof socket == 'undefined') {
+			creerSocket();
+  	 		envoyer();
+  	 	}
+
+  	 	var s = document.querySelector("#json").value;
+  	 	socket.emit('input_graph', s);
+  	 }
+
+  	 function fermer() {
+
+  	 }
+
+  	 creerSocket();
+
+</script>
