@@ -7,3 +7,13 @@ http://moodle.uqac.ca/
 Slides ici :
 https://docs.google.com/presentation/d/1M7uXtmq7k7waBcsVMy9qumn21Q4f3sQsN-UPu_hvzeo/edit?usp=sharing
 
+Équipes actuelles
+===========
+
+1. Guillaume Merindol,Cyril Chemla,Khalis Chalabi,Kevin Louzoun,Mathilde Laplaze
+
+2. Tom Canac, Arthur Roussel, Jeremy Spieldenner et Bastien Courtois
+
+3. Simon Côté,Maryssa Bouchard,Mathieu Naud,Steven Simard,Gabrielle Bastien
+ 
+ 
