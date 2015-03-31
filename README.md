@@ -18,5 +18,6 @@ https://docs.google.com/presentation/d/1M7uXtmq7k7waBcsVMy9qumn21Q4f3sQsN-UPu_hv
 6. Chapron Kevin
 7. Daehli Nadeau-Otis, Gillian Chaville, Samuel Laliberté, Julien Souvenir
 8. Morel Virginie, Simon Steven
+9. Antoine Lebeury, Simon Potvin, Andrew Salesse et Méghane Lagorce
  
  
