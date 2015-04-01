@@ -24,21 +24,20 @@ https://docs.google.com/presentation/d/1M7uXtmq7k7waBcsVMy9qumn21Q4f3sQsN-UPu_hv
 
 
 14 AVRIL (premiere semaine)
-Equipe de Quentin Brodier
-Equipe de Kevin
-Equipe de Valentin
-Equipe de Simon Potvin
-Equipe de Julien Souvenir
+1. Equipe de Quentin Brodier
+2. Equipe de Kevin
+3. Equipe de Valentin
+4. Equipe de Simon Potvin
+5. Equipe de Julien Souvenir
 
 
 21 AVRIL (deuxieme semaine)
-Equipe de Tom
-Equipe de Simon
-Equipe de Antoine Piriou
-Equipe de Kevin Chapron
-Equipe de Virginie
-Equipe de Vincent Pretet
-
+1. Equipe de Tom
+2. Equipe de Simon
+3. Equipe de Antoine Piriou
+4. Kevin Chapron
+5. Equipe de Virginie
+6. Equipe de Vincent Pretet
 
 28 AVRIL EXAMEN
 
