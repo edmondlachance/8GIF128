@@ -41,5 +41,13 @@ https://docs.google.com/presentation/d/1M7uXtmq7k7waBcsVMy9qumn21Q4f3sQsN-UPu_hv
 
 28 AVRIL EXAMEN
 
+
+DOCUMENT POUR RÉVISER L'EXAMEN
+===============================
+https://docs.google.com/presentation/d/1HA6fBb2zg5LsmZA8YH4plsE8R7KzAMPem0honojEprI/edit?usp=sharing
+
+
+
+
  
  
