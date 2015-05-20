@@ -1,13 +1,7 @@
 # 8GIF128 H2015
+Bienvenue sur la page du cours du 8GIF128 pour Hiver 2015, Conception de sites web
 
-Bienvenue sur la page du cours du 8GIF128, Conception de sites web
-Les slides du cours sont sur Moodle
-http://moodle.uqac.ca/
-
-Slides ici :
-https://docs.google.com/presentation/d/1M7uXtmq7k7waBcsVMy9qumn21Q4f3sQsN-UPu_hvzeo/edit?usp=sharing
-
-Équipes actuelles
+Équipes
 ===========
 
 1. Guillaume Merindol,Cyril Chemla,Khalis Chalabi,Kevin Louzoun,Mathilde Laplaze
@@ -22,14 +16,12 @@ https://docs.google.com/presentation/d/1M7uXtmq7k7waBcsVMy9qumn21Q4f3sQsN-UPu_hv
 10. Brodier Quentin, Vincent Bernière, Coulon Matthieu, Renan Decamps
 11. Vincent Pretet, Guillaume DUMONT
 
-
 14 AVRIL (premiere semaine)
 1. Equipe de Quentin Brodier
 2. Equipe de Kevin
 3. Equipe de Valentin
 4. Equipe de Simon Potvin
 5. Equipe de Julien Souvenir
-
 
 21 AVRIL (deuxieme semaine)
 1. Equipe de Tom
@@ -40,14 +32,4 @@ https://docs.google.com/presentation/d/1M7uXtmq7k7waBcsVMy9qumn21Q4f3sQsN-UPu_hv
 6. Equipe de Vincent Pretet
 
 28 AVRIL EXAMEN
-
-
-DOCUMENT POUR RÉVISER L'EXAMEN
-===============================
-https://docs.google.com/presentation/d/1HA6fBb2zg5LsmZA8YH4plsE8R7KzAMPem0honojEprI/edit?usp=sharing
-
-
-
-
- 
  
