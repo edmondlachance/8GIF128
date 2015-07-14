@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>GraphGen</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Generateur de graphes aleatoires connexes. Services disponibles: Minimum Spanning Tree,Djikstra,Realisation graphique du graphe. "/>
+  <link rel="stylesheet" type="text/css" href="css/reset.css">
+  <link rel="stylesheet" type="text/css" href="css/fancybox-thumbs.css">
+  <link rel="stylesheet" type="text/css" href="css/fancybox-buttons.css">
+  <link rel="stylesheet" type="text/css" href="css/fancybox.css">
+  <link rel="stylesheet" type="text/css" href="css/animate.css">
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+  <link rel="stylesheet" type="text/css" href="main2.css">
+
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/fancybox.js"></script>
+    <script type="text/javascript" src="js/fancybox-buttons.js"></script>
+    <script type="text/javascript" src="js/fancybox-media.js"></script>
+    <script type="text/javascript" src="js/fancybox-thumbs.js"></script>
+    <script type="text/javascript" src="js/wow.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+    <script src="springy.js"></script>
+    <script src="springyui.js"></script>
+</head>
+<body>
+
+<!--  Beginning billboard  -->
+  <section class="billboard light">
+    <header class="wrapper light">
+      <a href="#"><img class="logo" src="img/logo.png" alt=""/></a>
+    </header>
+
+    <div class="caption light animated wow fadeInDown clearfix">
+      <h1>GRAPHGENERATOR</h1>
+      <hr>
+    </div>
+    <div class="shadow"></div>
+  </section>
+  <!--  End billboard  -->
+
+  <section class="services wrapper">
+    <p id="exemple">
+    <label class="debut">Numbers of nodes</label> <input id="json" name="sommet" type="text"/> 
+    <label class="debut">Density</label> <input id="json2" name="densite" type="text"/>
+    <label class="debut">Source Node</label> <input id="json3" name="djkistra" type="text"/>
+    </p>
+    </br>
+
+    <input class="milieu" id="gen" name="Generer" type="submit" value="1.Ouvrir Websocket" onclick="creerSocket()" />
+
+    <input class="milieu" id="envoyer" name="envoyer" type="submit" value="2.Envoyer Valeurs" onclick="x.envoyer()" />
+
+    <input class="milieu" id="close" name="close" type="submit" value="3.Fermer WebSocket" onclick="x.fermer()" /> 
+
+   <div class="result" id="resultats"></div>
+    <p align="center"><div id="status" style="font-weight: bold;"> </div></p>
+
+<script>
+
+  var pp = document.querySelector("#exemple");
+  pp.innerHTML = pp.innerHTML.replace(/\n/g, "<br/>");
+  var ssss = document.querySelector("#status");
+  var x; //window.x
+  var resultats_node = document.querySelector("#resultats");
+
+    //Binds x to a websocket object
+    function creerSocket() {
+        //Clear old results
+        resultats_node.innerHTML = "";
+        ssss.innerHTML = "Websocket : Ouvert";
+        var graph = new Springy.Graph();
+        x = new webchaussette();
+    }
+
+    function webchaussette()
+    {
+      //Création d'un lien vers un websocket qui écoute sur le port 8080
+      this.ws = new WebSocket('ws:/107.161.160.127:8080');
+
+      //We have to wait for the socket to be opened to use SEND
+      this.ws.onopen = function() {
+        console.log("Opening connection");
+      };
+      this.ws.onclose = function() {
+        console.log("Closing connection");
+        ssss.innerHTML = "Websocket : Closed";
+      };
+      this.ws.onmessage = function(event) {
+        console.log("Incoming data\n");
+        var json = (event.data);    // Chaine de caractere principale
+        
+        // Integration des 3 services et rendu graphique
+
+        var res = json;  
+
+        //AJOUT du SERVICE 3
+        var service3 = json;
+        var sauv = "";
+        var V = false;
+        var P3 = false;
+        for (var i = 0; i < service3.length; i++) 
+        {
+        	if(service3[i] == "V")
+        	{
+        		V = true;
+        		P3 = true;
+        	}
+        	if(service3[i] == "P")
+        	{
+        		V = false;
+        		P3 = false;
+        	}
+        	if(V == true && P3 == true)
+        	{
+        		sauv = sauv + service3[i];
+        	}
+        }
+        var newSauv = sauv.slice(1, sauv.length - 1);
+        newSauv1 = "To : " + newSauv;
+        newSauv2 = newSauv1.split(',').join(", To : ");
+        newSauv3 = newSauv2.split('-').join(" Cost : ");
+
+        resultats_node.innerHTML += newSauv3; // Affichage de la chaine de caractere correspondant au Service 3
+        //FIN de l'ajout du SERVICE 3 
+       	
+       	//Parsing pour recuperer un tableau ne contenant que les POIDS 
+    	var extract = [];
+        var extract2 = [];
+  	    var i = 0;
+        var P = false;
+    	for(var x = 0; x < res.length;x++)
+    	{
+    		if(res[x] == "P")
+        	{
+           		P = true;
+        	}
+          	if(res[x] == " " && P == false)
+    		{
+    			extract[i] = res[x+1];
+    			i++;
+    		}
+    	}
+
+    	var res2 = "";
+        var res3 = "";
+    	var y = 0;
+        var P2 = false;
+    	for(var i = 0; i < res.length; i++)
+    	{
+          	if(res[i] == "P")
+          	{
+            	P2 = true;
+            	res3 = res3 + res.slice(i, res.length);
+          	}
+          	if(res[i] == " " && P2 == false)
+    		{
+    			res2 = res2 + res.slice(y, i);
+    			y = i + 2;
+    		}
+    	}
+
+        var z = 0;
+        for(var x = 1; x < res3.length; x++)
+        {
+          if(res3[x] == " ")
+          {
+            extract2[z] = res3[x+1];
+            z++;
+          }
+        }
+
+        res3 = res3.slice(1, res3.length);
+        res4 = "";
+        var w = 0;
+        for(var i = 0; i < res3.length; i++)
+        {
+          if(res3[i] == " ")
+          {
+            res4 = res4 + res3.slice(w, i);
+            w = i + 2;
+          }
+        }
+  		//FIN parsing les POIDS	
+        
+        
+        //DEBUT création du Graph principale integration du SERVICE 1 
+        var graph = new Springy.Graph();
+        var liens = res2;
+        var tab = [];
+        var temp = [];
+        var noeud = [];
+
+        //Fonction pour generer des couleurs aleatoirement. Permet d'avoir les liens de differentes couleurs.
+        function getRandomColor() 
+        {
+            var letters = '0123456789ABCDEF'.split('');
+            var color = '#';
+            for (var i = 0; i < 6; i++ ) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        //Fonction qui verifie si un tableau contient un element renvoi true ou false
+        function contains(a, obj) 
+        {
+            for (var i = 0; i < a.length; i++) 
+            {
+                if (a[i] === obj) 
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        var index = "";
+        for(var i = 0; i < liens.length; i++)
+        {
+          if(!isNaN(liens[i]))
+          {
+            if(i < liens.length - 1 && liens[i + 1] != ",")
+            {
+              index = index + liens[i];
+            }
+            else
+            {
+              tab.push(index + liens[i]);
+            }
+          }
+          else if(liens[i] == ",")
+          {
+            continue;
+          }
+          else
+          {
+            tab.push(index);
+            index = "";
+          }
+        }
+
+        temp.push(tab[0]);
+
+        //Boucle pour avoir un tableau qui ne possede pas d'occurence
+        for(var indice = 1; indice < tab.length; indice++)
+        {
+          if(contains(temp, tab[indice]) == false)
+          {
+            temp.push(tab[indice]);
+          }
+        }
+
+        //Boucle pour creer un tableau de noeud
+        for(var i = 0; i < temp.length; i++)
+        {
+          var j = graph.newNode({label: temp[i]})
+          noeud.push(j);
+        }
+
+        //Boucle pour creer un lien entre deux noeuds
+        var j = 0;
+        for(var i = 0; i < tab.length; i+=2)
+        {
+        	if(j < extract.length)
+        	{
+          		var sommet1 = noeud[temp.indexOf(tab[i])];
+          		var sommet2 = noeud[temp.indexOf(tab[i + 1])];
+          		graph.newEdge(sommet1, sommet2, {color: getRandomColor(), label: extract[j]});
+          		j+=1;
+          	}
+        }
+        //FIN integration SERVICE 1
+
+      //DEBUT integration SERVICE 2 
+        var service2 = res4;
+        var tab2 = [];
+        var temp2 = [];
+        var noeud2 = [];
+
+        var index2 = "";
+        for(var i = 0; i < service2.length; i++)
+        {
+          if(!isNaN(service2[i]))
+          {
+            if(i < service2.length - 1 && service2[i + 1] != ",")
+            {
+              index2 = index2 + service2[i];
+            }
+            else
+            {
+              tab2.push(index2 + service2[i]);
+            }
+          }
+          else if(service2[i] == ",")
+          {
+            continue;
+          }
+          else
+          {
+            tab2.push(index2);
+            index2 = "";
+          }
+        }
+
+        temp2.push(tab2[0]);
+
+        for(var indice = 1; indice < tab2.length; indice++)
+        {
+          if(contains(temp2, tab2[indice]) == false)
+          {
+            temp2.push(tab2[indice]);
+          }
+        }
+
+        for(var i = 0; i < temp2.length; i++)
+        {
+          var j = graph.newNode({label: temp2[i]});
+          noeud2.push(j);
+        }
+
+        var j2 = 0;
+        for(var i = 0; i < tab2.length; i+=2)
+        {
+              if(j2 < extract2.length)
+              {
+                var sommet1 = noeud2[temp2.indexOf(tab2[i])];
+                var sommet2 = noeud2[temp2.indexOf(tab2[i + 1])];
+                graph.newEdge(sommet1, sommet2, {label: extract2[j2]});
+                j2++;
+              }
+        }
+      //FIN SERVICE 2 
+
+        jQuery(function(){
+          var springy = window.springy = jQuery('#springydemo').springy({
+            graph: graph,
+            nodeSelected: function(node){
+              console.log('Node selected: ' + JSON.stringify(node.data));
+            }
+          });
+        });
+
+        }
+
+      this.send_data = function(s)
+      {
+        this.ws.send(s);
+      }
+
+      this.envoyer =  function()
+      {
+          var s = document.getElementById("json").value;
+          var t = document.getElementById("json2").value;
+          var SN = document.getElementById("json3").value;
+          this.send_data(s);
+          this.send_data(t);
+          this.send_data(SN);
+      }
+      this.fermer = function()
+      {
+          this.ws.close();
+          ssss.innerHTML = "Websocket : Closed";
+      }
+    }
+
+    creerSocket();
+    </script>
+
+    <!-- Debut Code Graphique --> 
+  <center><canvas id="springydemo" width="1100" height="800" /></center>
+    <!-- Fin Code Graphique --> 
+  </section>
+  
+  <!--  Beginning footer  -->
+  <footer>
+    <div class="wrapper">
+      <div class="rights">
+        <img src="img/logoblack.png" alt="" class="footer_logo"/>
+        <p>© GraphGenerator. All Rights Reserved 2015 </p>
+      </div>
+    </div>    
+  </footer>
+  <!--  End footer  -->
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+.milieu
+{
+	margin-left: 20%;
+	margin-top: 20px;
+}
+.result
+{
+	margin-left: 215px;
+	margin-top: 10px;
+	
+}
+#status
+{
+	color: green;
+	text-align: center;
+  	width: 300px;
+  	vertical-align: top;
+  	display: block;
+
+}
+.rouge 
+{
+	color: black;
+    font-weight: bold;
+}
+.debut, input[type=submit]
+{
+	display: block;
+	font-weight: bold;
+	font-family: "Trebuchet", Arial, Helvetica;
+	margin: auto;
+	text-align: center;
+	width: 200px;
+}
+p
+{
+	text-align: center;
+	display: block;
+}
+label
+{
+	vertical-align: left;
+}
