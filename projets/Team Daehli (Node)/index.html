@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+<head>
+    <title> Projet Final </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<link href="screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" src="/springy_m.js"></script>
+  <script type="text/javascript" src="/springyui_m.js"></script>
+  <!------------ SOCKET -------------->
+  <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
+  <style type="text/css">
+      body { 
+        padding : 20px;
+      }
+      .container-narrow {
+        margin: auto;
+        max-width: 960px;
+      }
+      .container-narrow > hr {
+        margin: 40px;
+      }
+      #projet{
+        color: #468499;
+        text-decoration:none;
+      }
+      #viz {
+        margin-right: 100px;
+        cursor: crosshair;
+        float: both;
+      }
+      #alert {
+        visibility:hidden;
+      }
+  </style>
+</head>
+<body>
+<body>
+<div class="container-narrow">
+    <ul class="nav nav-pills pull-right">
+        <li>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Generateur <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li>
+              <p> Sommets: <input id="sommets" name="sommets"> </p>
+              <p> Densite: <input id="densite" name="densite"> </p>
+              <input id="service1" name="service 1" type="submit" value="Generer" onclick="service1()" />
+            </li>
+          </ul>
+        </li>
+        <li >
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"> SSSP <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+              <li>
+                <p> Point de départ: <input id="start" name="start"> </p>
+                <input id="service2" name="service 2" type="submit" value="Calculer" onclick="service2()" />
+              </li>
+          </ul>
+        </li>
+        <li>
+          <a href="#" id="service3" class="dropdown-toggle" data-toggle="dropdown" onclick="service3()"> M.S.T <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+              <li><img src="http://www.gifsforum.com/images/gif/clap%20clap%20clap/grand/the_rock_clap_clap_gif.gif"/>Well done !</li>
+          </ul>
+        </li>
+    </ul>
+    <h3 class="text-muted"><a id="projet" href="/home"> <span class="glyphicon glyphicon-home" aria-hidden="true"> </span> Accueil</a></h3>
+    <hr>
+    <span id="alert"></span>
+
+    <div class="container-fluid">
+      <div id="row">
+        <div class="col-md-4">
+          <p id="matrice"></p>
+        </div>
+        <div class="col-md-4">
+          <p id="SSPT"></p>
+        </div><div class="col-md-4">
+          <p id= "MST"></p>
+        </div>
+      </div>
+    </div>
+    <div id="viz"> </div>
+  <script>
+    var socket;
+    var matrice_adj; //Matrice d'adjacence
+    var debut;       //Point de départ du SSSP
+    var adjalist;    //Liste d'adjacence
+    var graphJSON;   //JSON du graphe
+    var alert = document.querySelector("#alert");
+    var matrice = document.querySelector("#matrice");
+    var sspt = document.querySelector("#SSPT");
+    var mst = document.querySelector("#MST");
+    var viz = document.querySelector('#viz');
+
+    $(document).ready (function () {
+      alert.style.visibility = "visible";
+      alert.innerHTML = "<div class=\"alert alert-success\" role=\"alert\"> 1- Entrer le nombre de sommets et la densité désirés <span class=\"glyphicon glyphicon-arrow-up\"aria-hidden=\"true\"> </span> </div>";
+    });
+
+    function creerSocket() {
+
+      socket = io.connect('http://localhost:8070');
+
+      //Alerte en cas de non-connexité
+      socket.on ('alerte', function () {
+        alert.style.visibility = "visible";
+        alert.innerHTML = "<div class=\"alert alert-danger\" role=\"alert\"> Oups ! Error 69   <span class=\"glyphicon glyphicon-retweet\" aria-hidden=\"true\"> </span>  le graphe is disconnected</div>";
+      });
+
+      //Reçoit le JSON du graphe et l'affiche sur l'HTML avec Springy
+      //et dans la console
+      socket.on('graph_json', function (data) {
+        alert.style.visibility = "hidden";
+        graphJSON = data;
+        console.log (graphJSON);
+        viz.innerHTML = "<canvas id=\"springy_canvas\" width=\"960\" height=\"450\" />";
+        jQuery(function(){
+          var graph = new Springy.Graph();
+          graph.loadJSON(graphJSON);
+
+          var springy = jQuery('#springy_canvas').springy({graph: graph});
+        });
+        alert.style.visibility = "visible";
+        alert.innerHTML = "<div class=\"alert alert-success\" role=\"alert\"> 2- Entrer le point de départ du SSSP <span class=\"glyphicon glyphicon-arrow-up\"aria-hidden=\"true\"> </span> </div>";
+      });
+
+      //Reçoit la liste d'adjacence et l'affiche sur l'HTML et la console
+      socket.on ('adjalist', function (data) {
+        adjalist = data;
+        console.log (adjalist);
+        matrice.innerHTML = "<h3>Liste d'Adjacence: </h3>";
+        for (var i = 0; i < adjalist.length; i++) {
+          var liste = "<p><b>" + i + ": </b>";
+          for (var v=0; v <adjalist.length; v++) {
+            if (adjalist[i][v] !== 0) {
+              liste += "[" + adjalist[i][v].dest+ ','+ adjalist[i][v].poids + "] ";
+            }
+          }
+          liste += "</p>";
+          matrice.innerHTML += liste;
+        }
+      });
+
+      //Reçoit la matrice d'adjacence qui sera utilisé par Dijkstra
+      socket.on ('matrix', function (data) {
+        matrice_adj = data;
+        console.log(matrice_adj);
+      });
+
+      //Reçoit le poids total du MST et l'affiche sur l'HTML et la console
+      var cost;
+      socket.on ('prim', function (data) {
+        alert.style.visibility = "hidden";
+        cost = data[0];
+        console.log (cost);
+        mst.innerHTML = "<h3>MST: </h3>";
+        mst.innerHTML += "<p>"+ cost + "</p>";
+        graphJSON = data[1];
+        viz.innerHTML = "<canvas id=\"springy_canvas\" width=\"960\" height=\"450\" />";
+        jQuery(function(){
+          var graph = new Springy.Graph();
+          graph.loadJSON(graphJSON);
+
+          var springy = jQuery('#springy_canvas').springy({graph: graph});
+        });
+      });
+
+      //Reçoit le poids de chaque "shortest path" en tableau et l'affiche dans l'HTML
+      socket.on ('dijkstra_output', function (data) {
+        alert.style.visibility = "hidden";
+        console.log (data);
+        sspt.innerHTML = "<h3> Dijkstra :</h3>";
+        for (var i = 0; i < adjalist.length; i++) {
+          if (i !== parseInt(debut)) {
+            var path = "<p><b>" + debut + "->" + i + "</b> : " + data[i] + "</p>";
+            sspt.innerHTML += path;
+          }
+        }
+        alert.style.visibility = "visible";
+        alert.innerHTML = "<div class=\"alert alert-success\" role=\"alert\"> 3- Appuyer sur M.S.T. <span class=\"glyphicon glyphicon-arrow-up\"aria-hidden=\"true\"> </span> </div>";
+      });
+    }
+
+    //Genere le graphe
+    function service1() {
+      //Check si le socket existe avant...
+      if (typeof socket == 'undefined') {
+        creerSocket();
+        service1();
+      }
+      //Envoie le nombre sommets et la densité au generateur de graphes
+      var sommets = document.querySelector("#sommets").value;
+      var densite = document.querySelector("#densite").value;
+      console.log(sommets + " " + densite);
+      var s = sommets + " " + densite;
+      socket.emit('input_value', s);
+    }
+
+    //Calcul le SSSP selon le point de départ choisi par l'usager
+    function service2() {
+      //Check si le socket existe avant...
+      if (typeof socket == 'undefined') {
+        creerSocket();
+        service2();
+      }
+      debut = document.querySelector("#start").value;
+      var input = [matrice_adj, debut];
+      socket.emit('dijkstra', input);
+    }
+
+    //Calcul le poids total du MST
+    function service3() {
+      //Check si le socket existe avant...
+      if (typeof socket == 'undefined') {
+        creerSocket();
+        service3();
+      }
+      var input = [adjalist, graphJSON];
+      //Envoie la liste d'adjacence à l'algo de Prim
+      socket.emit('list_input', input);
+    }
+
+    function fermer() {
+    }
+
+
+  </script>
+  <script>
+    var clicked = false;
+    var clicked2 = false;
+    $('#service1').click(function() { clicked = !clicked });
+    $('#service2').click(function() { clicked2 = !clicked2 });
+    $('ul.dropdown-menu').on('click', function(event){
+        // The event won't be propagated up to the document NODE and 
+        // therefore delegated events won't be fired
+        if (!clicked)
+          event.stopPropagation();
+        if (!clicked2)
+          event.stopPropagation();
+    });
+  </script>
+</div>
+</body>
+</html>

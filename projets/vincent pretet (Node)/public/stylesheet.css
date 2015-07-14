@@ -1,0 +1,62 @@
+body { 
+  font: 14px helvetica neue, helvetica, arial, sans-serif;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+input[type="number"] {
+  width: 50px;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+#graph_density {
+  position: relative;
+  top: 5px;
+  margin-right: 5px;
+}
+
+#graph_edges {
+  position: relative;
+  left: 5px;
+}
+
+#break_one {
+  visibility: hidden;
+}
+
+#graph_visualization {
+  visibility: hidden;
+}
+
+#graph_algorithms {
+  width: 20%;
+  float: left;
+}
+
+#dijkstra_info {
+  visibility: hidden;
+}
+
+#dijkstra_distance {
+  position: relative;
+  left: 5px;
+}
+
+#prim_info {
+  visibility: hidden;
+}
+
+#prim_vertices {
+  position: relative;
+  left: 5px;
+}
+
+#cy {
+  height: 350px;
+  width: 80%;
+  float: left;
+}

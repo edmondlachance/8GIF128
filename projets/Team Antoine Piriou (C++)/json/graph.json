@@ -1,0 +1,56 @@
+{
+  "nodes": [
+    {
+      "id": "0",
+      "label": "lol",
+      "x": 0,
+      "y": 0,
+      "size": 1,
+      "color": "#777"
+    },
+    {
+      "id": "1",
+      "label": "lol",
+      "x": 1,
+      "y": 0,
+      "size": 1,
+      "color": "#777"
+    },
+    {
+      "id": "2",
+      "label": "lol",
+      "x": 2,
+      "y": 0,
+      "size": 1,
+      "color": "#777"
+    },
+    {
+      "id": "3",
+      "label": "lol",
+      "x": 3,
+      "y": 0,
+      "size": 1,
+      "color": "#777"
+    }
+  ],
+  "edges": [
+    {
+      "id": "01",
+      "source": "0",
+      "target": "1",
+      "color": "#777"
+    },
+    {
+      "id": "02",
+      "source": "0",
+      "target": "2",
+      "color": "#777"
+    },
+    {
+      "id": "13",
+      "source": "1",
+      "target": "3",
+      "color": "#777"
+    }
+  ]
+}

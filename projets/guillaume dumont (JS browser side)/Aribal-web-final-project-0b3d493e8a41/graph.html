@@ -1,0 +1,436 @@
+<html>
+<link rel="stylesheet" type="text/css" href="style.css">
+<body onload="GraphGenerator()">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<link href='http://fonts.googleapis.com/css?family=Josefin+Sans' rel='stylesheet' type='text/css'>
+<script src="springy.js"></script>
+<script src="springyui.js"></script>
+<script type="text/javascript"></script>
+<h1>Générateur de graphes</h1>
+<form id="formulaire" action="graph.html" method="get">
+    <p class="champform">Number of nodes: </p><input type="range" name="number" id='num' min="3" max="10" value ="5" step='1' oninput="UpdateNumberInput(this.value);" /><input class="value" type="text" id="valInput" value="" ><br/>
+    <p class="champform">Density: </p><input type="range" name="density" id='dens' min="0" max="100" step='10' oninput="UpdateDensityInput(this.value);" /><input class="value" type="text" id="densInput" value=""><br/></div>
+  <div class="champform"><button type="submit" value="Submit" onclick='SetValues()'>Submit</button>
+  <button type="reset" value="Reset">Reset</button>
+  <button type="button" value="Submit" onclick=LoadSssp()>SSSP</button>
+  <button type="button" value="Submit" onclick=LoadMst()>MST</button></div>
+</form>
+<a href='index.html' class='accueil'>retour a l'accueil</a>
+<script>
+    var tabSent=[]; //tableau permettant de dessiner le MST
+    var nodesNeighboursTab=[]; // matrice d'adjacence
+    var nodesTab=[]; //tableau contenant les noeuds
+    var edgeVisited=[]; //tableau listant les arcs visités
+    var edgesTab=[]; //tableau contenant les arcs
+    var visited=[]; //tableau listant les noeuds visités
+    var nodesNumber, text, table2;
+    var Infinity=42;
+    var minNodes=2;
+    var maxNodes=10;
+    var graph = new Springy.Graph();
+    var ssspLoaded=mstLoaded=false;
+    var firstLoaded=1;
+    
+    function SetValues(){
+    
+        var str = JSON.stringify(tabSent);
+        sessionStorage.tabSent = str;
+        /*var num=JSON.stringify(nodesNumber);
+        sessionStorage.nodesNumber=num;*/
+        GraphGenerator();
+        firstLoaded=0;
+        var fL = JSON.stringify(firstLoaded);
+        sessionStorage.firstLoaded = fL;
+    }
+        
+    function UpdateNumberInput(val) {//show value of range
+      document.getElementById('valInput').value=val;
+    } 
+    
+    function UpdateDensityInput(val) {//show value of range
+      document.getElementById('densInput').value=val; 
+    } 
+       
+    function MinimumSpanningTree(){//utilise Kruskal pour calculer le MST
+        if(!mstLoaded){ //vérifie que l'algorithme n'a pas déjà été chargé
+            mstLoaded=true;
+            
+            var i=1;
+
+            QuickSort();
+            /**affichage du tableau*/
+
+            table2 = document.createElement("table");
+            var row = table2.insertRow(-1);
+            var firstCell = row.insertCell(-1);
+            firstCell.appendChild(document.createTextNode("MST"));
+            visited[0]=[];
+            
+            /**ajout du edge le moins lourd*/
+           
+            graph.newEdge(nodesTab[tabSent[0][0]], nodesTab[tabSent[0][1]], {color: '#FF0000'}, tabSent[i][2]); //création d'un edge rouge
+            graph.removeEdge(graph.getEdges(nodesTab[tabSent[0][0]], nodesTab[tabSent[0][1]])[0]); //et suppression de l'ancien edge
+            visited[0].push(tabSent[0][0]);
+            visited[0].push(tabSent[0][1]);
+            Draw(0, 0);
+            /**boucle pour ajouter les autres edges de l'algorithme*/
+            while(i<tabSent.length || visited[0].length<nodesNumber){
+                if(!IsInArray(visited[0], tabSent[i][0]) && !IsInArray(visited[0], tabSent[i][1])){
+                                Draw(1, i);
+                            }
+                else if(!IsLinked(i)){
+                    Draw(visited.length, i);
+                }
+                            else if(!IsInArray(visited[0], tabSent[i][0]) || !IsInArray(visited[0], tabSent[i][1])){
+                                Draw(0, i);
+                    }
+                    
+                            
+                            else{
+                                /**on colorie les edges qui ne sont pas dans le MST en gris*/
+                                graph.newEdge(nodesTab[tabSent[i][0]], nodesTab[tabSent[i][1]], {color: '#858585'}, tabSent[i][2]);
+                                graph.removeEdge(graph.getEdges(nodesTab[tabSent[i][0]], nodesTab[tabSent[i][1]])[0]);
+                            }
+                            CheckIfConnected();
+                            i++;
+                }
+            document.body.appendChild(table2);
+            }
+    }
+    
+    function CheckIfConnected(){ //vérifie si les valeurs dans les différents tableaux sont liées
+        var foundLink=false;
+        var i=1;
+        while(i<visited.length && foundLink===false){
+            for(var j=0; j<visited[i].length; j++){
+                if(IsInArray(visited[0], visited[i][j]) ){
+                    MergeTabs(i);
+                    foundLink=true;
+                }
+            }
+            i++;
+        }
+    }
+    
+    function IsLinked(num){ // si une valeur est identique à une valeur du tableau 0
+        var i=0;
+        var linkFound=false;
+        while(i<visited.length && linkFound===false){
+            if(IsInArray(visited[i], tabSent[num][0]) || IsInArray(visited[i], tabSent[num][1]))
+                linkFound=true;
+            i++;
+        }
+        return linkFound;
+    }
+    
+    function MergeTabs(num){ //on fusionne les deux tableaux
+        var i;
+        for(i=0; i<visited[num].length; i++){
+            if(!IsInArray(visited[0], visited[num][i])){
+                visited[0].push(visited[num][i]);
+            }
+        }
+        visited.splice(i);
+    }
+    
+    
+    function Draw(TabNumber, i){ //fonction qui dessine le MST sur le graphe et met à jour le tableau
+            if(visited[TabNumber]===undefined)
+                visited[TabNumber]=new Array(nodesNumber);
+            if(!IsInArray(visited[TabNumber], tabSent[i][0]) ){
+                visited[TabNumber].push(tabSent[i][0]);
+            }
+            if(!IsInArray(visited[TabNumber], tabSent[i][1])){
+                visited[TabNumber].push(tabSent[i][1]);
+            }
+            var row = table2.insertRow(-1);
+            var firstCell = row.insertCell(-1);
+            firstCell.appendChild(document.createTextNode(tabSent[i][0].toString()));
+            var secondCell = row.insertCell(-1);
+            secondCell.appendChild(document.createTextNode(tabSent[i][1].toString()));
+            var thirdCell=row.insertCell(-1);
+            thirdCell.appendChild(document.createTextNode(tabSent[i][2].toString()));
+            graph.newEdge(nodesTab[tabSent[i][0]], nodesTab[tabSent[i][1]], {color: '#FF0000'}, tabSent[i][2]); //création d'un edge rouge
+            graph.removeEdge(graph.getEdges(nodesTab[tabSent[i][0]], nodesTab[tabSent[i][1]])[0]); //et suppression de l'ancien edge
+        
+    }
+    
+        function IsInArray(array, val){ //vérifie si la valeur se trouve dans le tableau
+            var i=0;
+            var found=false;
+
+            
+            while(i<array.length && !found){
+                if (array[i]==val){
+                    found=true;
+                }
+                
+                i++;
+            }
+
+            return found;
+        }
+    
+    function QuickSort(){ //trie le tableau
+        for(var i=0; i<tabSent.length; i++){
+            for(var j=0; j<tabSent.length; j++){
+
+                    if(tabSent[i][2]<tabSent[j][2]){
+                        Swap(i, j);
+                    }
+                
+            }
+        }
+    }
+    
+    function Swap(i, j){ //échange deux valeur pour le tri
+        for(var k=0; k<3; k++){
+            var temp;
+            temp=tabSent[j][k];
+            tabSent[j][k]=tabSent[i][k];
+            tabSent[i][k]=temp;
+        }
+    }
+        
+    function shortestPath() { //Dijkstra
+        for(var k=0; k<nodesNumber; k++){
+            var done = new Array(nodesNumber);
+            done[k] = true;
+            var pathLengths = new Array(nodesNumber);
+            var predecessors = new Array(nodesNumber);
+            for (var i = 0; i < nodesNumber; i++) {
+              pathLengths[i] = nodesNeighboursTab[k][i];
+              if (nodesNeighboursTab[k][i] !== Infinity) {
+                predecessors[i] = k;
+              }
+            }
+            pathLengths[k] = 0;
+            for (var i = 0; i < nodesNumber; i++) {
+              var closest = -1;
+              var closestDistance = Infinity;
+              for (var j = 0; j < nodesNumber; j++) {
+                if (!done[j] && pathLengths[j] < closestDistance) {
+                  closestDistance = pathLengths[j];
+                  closest = j;
+                }
+              }
+              done[closest] = true;
+              for (var j = 0; j < nodesNumber; j++) {
+                if (!done[j]) {
+                  var possiblyCloserDistance = pathLengths[closest] + nodesNeighboursTab[closest][j];
+                  if (possiblyCloserDistance < pathLengths[j]) {
+                    pathLengths[j] = possiblyCloserDistance;
+
+                    predecessors[j] = closest;
+                  }
+                }
+              }
+              
+            }
+            if (possiblyCloserDistance < pathLengths[j])
+                    pathLengths[j] = possiblyCloserDistance;
+            for(var i=0; i<nodesNumber; i++)
+                nodesNeighboursTab[k][i]=pathLengths[i];
+        }
+    }
+    
+        
+    function LoadSssp(){ //charge l'algorithme de Dijkstra
+        if(!ssspLoaded){//vérifie que l'algorithme n'a pas déjà été chargé
+            ssspLoaded=true;
+            //$('#formulaire').load('sssp.html #sssp');
+            //var newArr = JSON.parse(sessionStorage.tabSent);
+            //var nodesNumber=JSON.parse(sessionStorage.nodesNumber);
+
+            var table = document.createElement("table");
+            var row = table.insertRow(-1);
+            var firstCell = row.insertCell(-1);
+            firstCell.appendChild(document.createTextNode("SSSP"));
+            var ssspTab=[];
+            var i, j;
+            shortestPath();
+
+            /**affichage du résultat dans un tableau*/
+            for(i=0; i<nodesNumber; i++){
+                for(j=0; j<nodesNumber; j++){
+                    if(i!==j){
+                        //result[i]=nodesNeighboursTab[i][j];
+                        ssspTab[i]=i.toString()+"-"+j.toString()+"=";
+                        var row = table.insertRow(-1);
+                        var firstCell = row.insertCell(-1);
+                        firstCell.appendChild(document.createTextNode(ssspTab[i]));
+                        var secondCell = row.insertCell(-1);
+                        if(nodesNeighboursTab[i][j]===Infinity)
+                            nodesNeighboursTab[i][j]=nodesNeighboursTab[j][i];
+                        secondCell.appendChild(document.createTextNode(nodesNeighboursTab[i][j]));
+                    }
+                }
+
+            }
+
+            document.body.appendChild(table);
+        }
+    }
+    
+    function LoadMst(){ //appelle la fonction qui calcule le MST
+        //$('#formulaire').load('mst.html #mst');
+        MinimumSpanningTree();
+    }
+    
+    function GraphGenerator(){ //calcule et génère le graphe dans le canvas
+        
+        firstLoaded=sessionStorage.firstLoaded;
+        //if(firstLoaded==0){
+        var density;
+
+        var i, j;
+        var edgeCount=count=0;
+        var rand;
+        nodesNumber=getQueryVariable("number");
+        density=getQueryVariable("density");
+        var table = document.createElement("table");
+        var row = table.insertRow(-1);
+        var firstCell = row.insertCell(-1);
+        firstCell.appendChild(document.createTextNode("Edges"));
+        
+        UpdateNumberInput(5);
+        UpdateDensityInput(50);
+            /*initialisation du tableau de voisinage*/
+            for(i=0; i<nodesNumber; i++){
+                    nodesNeighboursTab[i]=new Array(nodesNumber);
+                    for(j=0; j<nodesNumber; j++){
+                            nodesNeighboursTab[i][j]=Infinity;
+                    }
+            }
+
+
+            /*initialisation du tableau à envoyer aux autres pages*/
+            
+            
+            for(i=0; i<nodesNumber; i++)
+                edgeVisited[i]=new Array(nodesNumber);
+            
+            for(i=0; i<nodesNumber; i++){
+                for(j=0; j<nodesNumber; j++)
+                    edgeVisited[i][j]=false;
+                }
+                    
+            /*creation des noeuds*/
+            for(i=0; i<nodesNumber; i++){
+                    var currentNode=graph.newNode({label: i.toString()});
+                    nodesTab.push(currentNode);
+            }
+
+            
+            /*creation des axes*/
+            for(i=0; i<nodesTab.length; i++){
+                    for(j=0; j<nodesTab.length; j++){
+                            if(i!==j){
+                                    rand=Math.floor((Math.random() * 100 +1));
+                                    if(rand<density ){
+                                            if(nodesNeighboursTab[i][j]===Infinity && nodesNeighboursTab[j][i]===Infinity && (!edgeVisited[i][j] || !edgeVisited[i][j])){
+                                                var edgeValue=Math.floor(Math.random() * 10 +1);
+                                                edgesTab.push(graph.newEdge(nodesTab[i], nodesTab[j], {color: "#" + Math.random().toString(16).slice(2, 8)}, edgeValue)); //crÃ©ation du new edge avec couleur alÃ©atoire
+                                                    
+                                                /**création du tableau des edges affiché sur la page*/
+                                                var row = table.insertRow(-1);
+                                                var firstCell = row.insertCell(-1);
+                                                firstCell.appendChild(document.createTextNode(i.toString()));
+                                                var secondCell = row.insertCell(-1);
+                                                secondCell.appendChild(document.createTextNode(j.toString()));
+                                                var thirdCell=row.insertCell(-1);
+                                                thirdCell.appendChild(document.createTextNode(edgeValue.toString()));
+                                                
+                                                
+                                                //alert(i+"-"+j+"-"+edgeValue);
+                                                /**actualisation des variables et tableaux de voisinage*/
+                                                edgeCount++;
+                                                nodesNeighboursTab[i][j]=edgeValue; //maj du tableau de voisinage
+                                                nodesNeighboursTab[j][i]=edgeValue; //maj du tableau de voisinage
+                                                
+                                                var values=[i, j, edgeValue];
+                                                tabSent.push(values);
+                                                
+                                                edgeVisited[i][j]=true;
+                                                edgeVisited[j][i]=true;
+                                                
+                                                count++;
+                                            }
+                                            
+                                    }
+                            }
+                    }
+                    //si aucun edge n'a ete cree, en creer au moins un vers un sommet aleatoire
+                    if (count===0){
+                            rand=i;
+                            var iterations=0;
+                            var max=nodesNumber*(nodesNumber-1);
+                            var found=false;
+                            while(!found && iterations<=max){
+                                if(rand===i || (nodesNeighboursTab[i][rand]!==Infinity && nodesNeighboursTab[rand][i]!==Infinity))
+                                    var rand=Math.floor(Math.random() * nodesNumber);
+                                else
+                                    found=true;
+                                iterations++;
+                            }
+                            if(iterations<max){
+                            edgeValue=Math.floor(Math.random() * 10 +1);
+                            nodesNeighboursTab[i][rand]=edgeValue;
+                            nodesNeighboursTab[rand][i]=edgeValue;
+                            var values=[i, rand, edgeValue];
+                            tabSent.push(values);
+                            edgesTab.push(graph.newEdge(nodesTab[i], nodesTab[rand], {color: "#" + Math.random().toString(16).slice(2, 8)}, edgeValue)); //crÃ©ation du new edge avec couleur alÃ©atoire
+                            
+                            /**création du tableau des edges affiché sur la page*/
+                            var row = table.insertRow(-1);
+                            var firstCell = row.insertCell(-1);
+                            firstCell.appendChild(document.createTextNode(i.toString()));
+                            var secondCell = row.insertCell(-1);
+                            secondCell.appendChild(document.createTextNode(rand.toString()));
+                            var thirdCell=row.insertCell(-1);
+                            thirdCell.appendChild(document.createTextNode(edgeValue));
+                            edgeCount++;
+                            
+                             edgeVisited[i][j]=true;
+                    }
+                }
+                    //SetValues();
+                    count=0;
+            }
+            var row = table.insertRow(1);
+            var firstCell = row.insertCell(-1);
+            firstCell.appendChild(document.createTextNode(nodesNumber.toString()));
+            var secondCell = row.insertCell(-1);
+            secondCell.appendChild(document.createTextNode(edgeCount.toString()));
+                            
+            linebreak = document.createElement("br");
+            var child = document.getElementById('springydemo');
+            child.parentNode.appendChild(linebreak, child);
+            document.body.appendChild(table);
+
+            
+    jQuery(function(){
+      var springy = window.springy = jQuery('#springydemo').springy({
+        graph: graph,
+        nodeSelected: function(node){
+          console.log('Node selected: ' + JSON.stringify(node.data));
+        }
+      });
+    });
+   // }
+}
+/*fonction permettant de récupérer les données du formulaire*/
+function getQueryVariable(variable)
+{
+       var query = window.location.search.substring(1);
+       var vars = query.split("&");
+       for (var i=0;i<vars.length;i++) {
+               var pair = vars[i].split("=");
+               if(pair[0] == variable){return pair[1];}
+       }
+       return(false);
+}
+</script>
+<canvas id="springydemo" width="800" height="600" />
+</body>
+</html>

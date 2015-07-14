@@ -1,0 +1,1 @@
+function dont(){alert("Don't.")};

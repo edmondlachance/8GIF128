@@ -1,0 +1,48 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="style.css">
+<link href='http://fonts.googleapis.com/css?family=Josefin+Sans' rel='stylesheet' type='text/css'>
+<script script type="text/javascript" src="springy.js"></script>
+<style>
+    
+    form{
+    margin: 0 auto;
+}
+    p{
+    text-align: center;
+    font-size: 16px;
+}
+*{font-size: auto;}
+</style>
+</head>
+
+<body onload="LoadValues()">
+    <script>
+    
+    function LoadValues(){
+        document.getElementById('valInput').value=5;
+        document.getElementById('densInput').value=50;
+        
+    }
+    
+    function UpdateNumberInput(val) {//show value of range
+      document.getElementById('valInput').value=val;
+    } 
+    
+    function UpdateDensityInput(val) {//show value of range
+      document.getElementById('densInput').value=val; 
+      } </script>
+<h1>Projet final de conception web</h1>
+<h2>Session Hiver 2015</h2>
+<h2>par Guillaume Dumont</p></h2>
+<p>Entrez un nombre de noeuds et une densité puis cliquez sur le bouton <em>Go!</em></p>
+    <form id="portail" action="graph.html" method="get">
+    Number of nodes: </p><input type="range" name="number" id='num' min="3" max="10" value ="5" step='1' oninput="UpdateNumberInput(this.value);" /><input class="value" type="text" id="valInput" value=""><br/>
+   Density: </p><input type="range" name="density" id='dens' min="0" max="100" step='10' oninput="UpdateDensityInput(this.value);" /><input class="value" type="text" id="densInput" value=""><br/>
+  <button type="submit" value="Submit" onclick='SetValues()'>Go!</button>
+  <button type="reset" value="Reset">Reset</button>
+    </form>
+</form>
+</form>
+</body>
+</html>

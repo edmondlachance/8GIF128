@@ -1,0 +1,133 @@
+body {
+ 	font-family:"trebuchet ms",sans-serif;
+ 	font-size:90%;
+	background-color: #eeeeee;
+	background-image: url("paper.jpg");
+	background-size: 100%;
+    	background-repeat: no-repeat;
+	background-attachment: fixed;
+ }
+
+canvas{
+width: 50%;
+float:left;
+display: inline;
+margin-left: 20px;
+ box-shadow:1px 1px 2px black inset;
+margin-bottom: 15px;
+}
+
+canvas, form{
+background-image: url("background2.jpg");
+}
+
+form {
+margin-left: 40px;
+margin-top:30px;
+ padding:10px;
+ width:280px;
+ box-shadow:1px 1px 2px black inset;
+ }
+
+input{
+ background-color:#F3F3F3;
+margin-top:5px;
+ padding:3px;
+ border:1px solid #F5C5C5;
+ border-radius:5px;
+ width:200px;
+ box-shadow:1px 1px 2px black inset;
+ width:100px;
+ margin-left:5px;
+ box-shadow:1px 1px 1px #CFCDEF;
+ cursor:pointer;
+ }
+
+table, tr, td{border-left:1px solid #dddddd;
+	border-right:1px solid #dddddd;	
+	border-bottom:1px solid #dddddd;
+}
+
+table{
+font-size : 16px;
+margin-bottom: 30px;
+margin-left: 20px;
+margin-right: 20px;
+display: inline;
+width: 10%;
+}
+
+.title{
+	 box-shadow:1px 1px 2px black inset;
+	margin-top:10px;
+}
+
+button{
+border-color: #8AC007;
+    background-color: #dddddd;
+    border:1px solid black;
+    border-radius:4px;
+margin-top:15px;
+}
+
+h1
+{
+  font-size: 48px;
+  line-height: 25px;
+  text-transform: uppercase;
+  color: white; 
+  padding:32px;
+  font-weight:lighter;
+box-shadow: 1px 1px 1px 1px black;
+}
+
+h2 {
+  font-size: 24px;
+  color: white;
+  padding:16px;
+  font-weight:lighter; 
+  line-height:32px;
+text-transform: capitalize;
+}
+
+h1, h2, p{
+	color: #000000;
+	text-align:center;
+  	font-family:'Josefin Sans', Helvetica, Arial, sans-serif;
+}
+
+td {
+
+padding : 0.08em 1em;
+border-top : 1px solid #aaa;
+}
+
+a:hover, a:focus {
+color : #000;
+}
+
+a:after {
+content : "";
+display : block;
+background : #a28351;
+height : 2px;
+width : 100%;
+position : absolute;
+bottom : -0.2em;
+left : 0;
+opacity : 0;
+transition : all 0.25s linear;
+}
+
+a {
+text-decoration : none;
+color : #a28351;
+transition : all 0.25s linear;
+position: absolute;
+right:30px;
+top: 20%;
+}
+
+table, tr, td{
+overflow: visible;
+}

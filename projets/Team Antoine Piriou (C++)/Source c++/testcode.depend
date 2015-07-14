@@ -1,0 +1,18 @@
+# depslib dependency file v1.0
+1429418013 source:c:\users\antoine\desktop\test\testcode\main.cpp
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<vector>
+	"tree.h"
+
+1429492243 source:c:\users\antoine\desktop\test\testcode\tree.cpp
+	"tree.h"
+
+1429417592 c:\users\antoine\desktop\test\testcode\tree.h
+	<list>
+	<vector>
+	<cstdlib>
+	<stdio.h>
+	<time.h>
+

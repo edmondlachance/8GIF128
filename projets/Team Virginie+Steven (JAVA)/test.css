@@ -1,0 +1,45 @@
+body {
+  padding-left: 10px;
+  padding-right: 10px;
+  
+  background: #D2CAEC;
+}
+
+header {
+	font-family: "Times New Roman", Times, serif;
+	font-size: 36px;
+	text-align: center;
+}
+
+.formulaire {
+	width: 175px;
+	
+	margin-top: 30px;
+	
+	padding-top: 10px;
+	padding-bottom: 10px;
+	padding-left: 10px;
+	padding-right: 10px;
+	
+	border-top: 1px solid black;
+    border-bottom: 1px solid black;
+	border-left: 1px solid black;
+    border-right: 1px solid black;
+	
+	border-radius: 10px;
+	
+	float: left;
+}
+
+.sssp {
+	width: 175px;
+	
+	margin-top: 30px;
+	
+	padding-top: 10px;
+	padding-bottom: 10px;
+	padding-left: 10px;
+	padding-right: 10px;
+	
+	float: right;
+}

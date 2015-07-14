@@ -1,0 +1,8 @@
+{
+  "name": "graph-portal",
+  "dependencies": {
+    "jquery": "2.1.3",
+    "vis": "3.12.0",
+    "materialize": "0.96.1"
+  }
+}

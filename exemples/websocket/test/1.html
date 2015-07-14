@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Parcours DFS</title>
+     <style>
+    .rouge {
+      color: red;
+      font-weight: bold;
+    }
+     </style>
+  </head>
+  <body>
+
+<p id="exemple">
+<strong>Exemple de fichier :</strong> 
+6
+0 1
+1 2
+2 3
+3 5
+3 4
+0 5
+5 4
+4 1
+3 6
+5 2
+#
+</p>
+
+
+<p>
+<textarea id="json" name="json"   style="width: 300px; height: 150px;"></textarea>
+</p>
+
+<input id="gen" name="Generer" type="submit" value="1.Ouvrir websocket" onclick="creerSocket()" />
+
+<input id="envoyer" name="envoyer" type="submit" value="2.Envoyer valeurs" onclick="x.envoyer()" />
+
+<input id="close" name="close" type="submit" value="3.Fermer WebSocket" onclick="x.fermer()" />
+
+<div id="resultats">   </div>
+
+<div id="status" style="font-weight: bold;"> </div>
+
+<script>
+
+  var pp = document.querySelector("#exemple");
+  pp.innerHTML = pp.innerHTML.replace(/\n/g, "<br/>");
+  var ssss = document.querySelector("#status");
+  var x; //window.x
+  var resultats_node = document.querySelector("#resultats");
+
+    //Binds x to a websocket object
+    function creerSocket() {
+        //Clear old results
+        resultats_node.innerHTML = "";
+        ssss.innerHTML = "Websocket : Ouvert";
+        x = new webchaussette();
+    }
+
+    function webchaussette()
+    {
+      //Création d'un lien vers un websocket qui écoute sur le port 8080
+      this.ws = new WebSocket('ws://localhost:8080/');
+
+      //We have to wait for the socket to be opened to use SEND
+      this.ws.onopen = function() {
+        console.log("Opening connection");
+      };
+      this.ws.onclose = function() {
+        console.log("Closing connection");
+        ssss.innerHTML = "Websocket : Fermé";
+      };
+      this.ws.onmessage = function(event) {
+        console.log("Incoming data\n");
+        var json = (event.data);
+        resultats_node.innerHTML +='<p class="rouge">'+json+'</p>';
+        }
+
+      this.send_data = function(s)
+      {
+        this.ws.send(s);
+      }
+
+      this.envoyer =  function()
+      {
+          var s = document.getElementById("json").value;
+          this.send_data(s);
+      }
+      this.fermer = function()
+      {
+          this.ws.close();
+          ssss.innerHTML = "Websocket : Fermé";
+      }
+    }
+
+    creerSocket();
+    </script>
+
+  </body>
+</html>

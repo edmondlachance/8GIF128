@@ -1,0 +1,51 @@
+---
+title: Testify
+viewport: 'width=device-width, initial-scale=1'
+...
+
+<script src="js/sigma.min.js"></script>
+<script src="js/sigma.plugin.dragNodes.js"></script>
+<script src="js/dont.js"></script>
+<script src="js/test.js"></script>
+<div class="container">
+
+<div class="jumbotron">
+
+Graph Theory
+============
+
+<form>
+<div class="form-group">
+
+<div class="row">
+
+<div class="col-xs-4">
+
+<label for="vertices">Vertices number</label>
+<input type="text" class="form-control" id="vertices" placeholder>
+
+</div>
+
+<div class="col-xs-4">
+
+<label for="vertices">Density</label>
+<input type="text" class="form-control" id="density" placeholder="Percentage">
+
+</div>
+
+</div>
+
+</div>
+
+<button type="submit" class="btn btn-default">
+Draw my graph!
+</button>
+
+</div>
+
+</div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="js/bootstrap.min.js"></script>

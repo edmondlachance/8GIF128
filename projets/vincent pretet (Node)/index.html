@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>graph project - web portal</title>
+    <link href="stylesheet.css" rel="stylesheet" />
+  </head>
+ 
+  <body>
+    <h1>welcome to the graph project web portal</h1>
+    <section id="graph_generator">
+    <h2>Graph Generator</h2>
+    <form action="/" method="post" id="graph_inputs">
+      <label for="graph_vertices">Number of vertices:</label><input type="number" name="graph_vertices" id="graph_vertices"  min="2" max="10" step="1" value="5"autofocus />
+      <label for="graph_density">Density:</label><input type="range" name="graph_density" id="graph_density" min="50" max="100" step="2" value="60" /><output id="density"></output>
+      <input type="submit" id="graph_generate" value="Generate" />
+    </form>
+    <div>
+      <p>Number of edges:<span id="graph_edges"></span></p>
+    </div>
+    </section>
+    <hr id="break_one">
+    <section id="graph_visualization">
+    <div id="graph_algorithms">
+      <div id="dijkstra">
+        <h2>Dijkstra</h2>
+        <form action="/dijkstra" method="post" id="dijkstra_inputs">
+          <label for="dijkstra_start">Starting vertex:</label><input type="number" name="dijkstra_start" id="dijkstra_start"  min="0" max="10" step="1" value="0" /><br>
+          <label for="dijkstra_end">Ending vertex:</label><input type="number" name="dijkstra_end" id="dijkstra_end"  min="0" max="10" step="1" /><br>
+          <input type="submit" id="go_dijkstra" value="Dijkstra" />
+        </form>
+        <div id="dijkstra_info">
+          <p>Distance:<span id="dijkstra_distance"></span></p>
+        </div>
+      </div>
+      <div id="prim">
+        <h2>Prim</h2>
+        <button id="go_prim" name="go_prim">Prim</button>
+        <div id="prim_info">
+          <p>Vertices:<span id="prim_vertices"></span></p>
+        </div>
+      </div>
+    </div>
+
+    <div id="cy"></div>
+    </section>
+
+    <!-- <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script> -->
+    <script src="jquery.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var input_density = document.querySelector("#graph_density");
+      var output_density = document.querySelector("#density");
+      
+      output_density.innerHTML = input_density.value;
+      
+      document.querySelector("#graph_density").addEventListener('change', function() {
+        output_density.innerHTML = input_density.value;
+      }, false);
+    </script>
+    <script src="cytoscape.js"></script>
+    <!-- <script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.js"></script> -->
+
+<script>
+
+// Connection to socket.io
+var socket = io.connect('http://localhost:8080');
+
+// After receiving the graph, we build it to cytoscape format in order to display it on the webpage
+socket.on('graph', function(graph) {
+  insertGraph(graph);
+  
+  document.getElementById('break_one').style.visibility = 'visible';
+  document.getElementById('graph_visualization').style.visibility = 'visible';
+  
+  // DIJKSTRA
+  var elements = buildCytoscapeElements(graph);
+  console.log(elements);
+  drawGraph(elements);
+
+  var startingVertex = '#';
+  var endingVertex = '#';
+
+  $('#dijkstra_inputs').submit(function () {
+
+    startingVertex += document.querySelector("#dijkstra_start").value;
+    endingVertex += document.querySelector("#dijkstra_end").value;
+
+    var dijkstra = cy.elements().dijkstra(startingVertex, function(){
+      return this.data('weight');
+    },false);
+    var bfs = dijkstra.pathTo( cy.$(endingVertex) );
+    console.log('bfs result');
+    console.log(bfs);
+    var x=0;
+    
+    var highlightNextEle = function() {
+     var el=bfs[x];
+      el.addClass('highlighted');
+      if(x<bfs.length){
+        x++;
+        setTimeout(highlightNextEle, 500);
+      }
+    };
+
+    // kick off first highlight
+    highlightNextEle();
+
+    document.getElementById('dijkstra_distance').innerHTML = dijkstra.distanceTo( cy.$(endingVertex));
+    var dijkstraInfo = document.getElementById('dijkstra_info'); dijkstraInfo.style.visibility = 'visible';
+
+    return false;
+  });
+  
+  // PRIM
+  document.getElementById('go_prim').addEventListener('click', function() {
+    var resultOfPrim = Prim(buildGraphForPrim(graph));
+    
+    document.getElementById('prim_vertices').innerHTML = resultOfPrim;
+    var primInfo = document.getElementById('prim_info'); primInfo.style.visibility = 'visible';
+
+    ///////////////////////////////////////////////////////////////////// color prim - @todo
+    /*
+    1. get cy elements
+    2. clear highlighted elements
+    4. get path between nodes returned by prim's algorithm
+    3. highlight nodes and path
+     */
+    /////////////////////////////////////////////////////////////////////
+    
+    return false;
+  }, false);
+
+});
+
+
+$('#graph_inputs').submit(function () {
+  var graph = {};
+  graph.vertices = $('#graph_vertices').val();
+  graph.density = $('#graph_density').val();
+  graph.graph = {};
+  
+  socket.emit('new_graph', graph); // Sends graph to the server
+  
+  return false;
+});
+
+// Adds graph to page
+function insertGraph(graph) {
+  document.getElementById('graph_edges').innerHTML = graph.edges;
+  console.log(graph);
+}
+
+var cy;
+
+var drawGraph = function(elements){
+
+  cy = cytoscape({
+    container: document.getElementById('cy'),
+
+    style: cytoscape.stylesheet()
+      .selector('node')
+        .css({
+          'content': 'data(id)'
+        })
+      .selector('edge')
+        .css({
+          'content': 'data(weight)',
+          'color': '#9E467A',
+          'width': 4,
+          'line-color': '#FFCBAA',
+          'target-arrow-color': '#FFCBAA'
+        })
+      .selector('.highlighted')
+        .css({
+          'background-color': '#61bffc',
+          'line-color': '#61bffc',
+          'target-arrow-color': '#61bffc',
+          'transition-property': 'background-color, line-color, target-arrow-color',
+          'transition-duration': '0.5s'
+        }),
+        
+    elements: elements,
+
+    layout: {
+      name: 'breadthfirst',
+      directed: true,
+      roots: '#0',
+      padding: 10
+    }
+  });
+};
+
+function buildCytoscapeElements(graph) {
+  var elements = {};
+  elements.nodes = [];
+  elements.edges = [];
+  
+  for (var i = 0; i < graph.vertices; i++) {
+    var node = {};
+    node.data = {};
+    node.data.id = i.toString();
+    
+    elements.nodes.push(node);
+  }
+    
+  for (var i = 0; i < graph.edges; i++){
+    var edge = {};
+    var id = '', source = '', target = '', weight = 0;
+    
+    source += graph.edgeList[i][0];
+    target += graph.edgeList[i][1];
+    weight += graph.edgeList[i][2];
+    
+    id +=  source + target;
+    
+    edge.data = {};
+    edge.data.id = id;
+    edge.data.source = source;
+    edge.data.target = target;
+    edge.data.weight = weight;
+    
+    elements.edges.push(edge);
+  }
+  
+  return elements;
+}
+
+/**
+ * Prim
+ * https://gist.github.com/methodin/1577481
+ * prim's algorithm, implemented by methodin - https://gist.github.com/methodin
+ **/
+ 
+ // Represents an edge from source to sink with capacity
+var Edge = function(source, sink, capacity) {
+    this.source = source;
+    this.sink = sink;
+    this.capacity = capacity;
+};
+
+// Main class to manage the network
+var Graph = function() {
+    this.edges = {};
+    this.nodes = [];
+    this.nodeMap = {};
+    
+    // Add a node to the graph
+    this.addNode = function(node) {
+        this.nodes.push(node);
+        this.nodeMap[node] = this.nodes.length-1;
+        this.edges[node] = [];
+    };
+
+    // Add an edge from source to sink with capacity
+    this.addEdge = function(source, sink, capacity) {
+        // Create the two edges = one being the reverse of the other    
+        this.edges[source].push(new Edge(source, sink, capacity));
+        this.edges[sink].push(new Edge(sink, source, capacity));
+    };
+    
+    // Does edge from source to sink exist?
+    this.edgeExists = function(source, sink) {
+        if(this.edges[source] !== undefined) 
+            for(var i=0;i<this.edges[source].length;i++)
+                if(this.edges[source][i].sink == sink)
+                    return this.edges[source][i];
+        return null;
+    };
+};
+
+function Prim(g) {
+    var result = [];
+    var usedNodes = {};
+    
+    function findMin(g) {
+        var min = [999999,null];
+        for(var i=0;i<result.length;i++) 
+            for(var n=0;n<g.edges[result[i]].length;n++) 
+                if(g.edges[result[i]][n].capacity < min[0] && usedNodes[g.edges[result[i]][n].sink] === undefined)
+                    min = [g.edges[result[i]][n].capacity, g.edges[result[i]][n].sink];
+        return min[1];
+    }
+    
+    // Pick random start point
+    var node = g.nodes[Math.round(Math.random()*(g.nodes.length-1))];
+    result.push(node);
+    usedNodes[node] = true;
+    
+    var min = findMin(g);
+    while(min != null) {
+        result.push(min);
+        usedNodes[min] = true;
+        min = findMin(g);
+    }
+    
+    return result;
+};
+
+function buildGraphForPrim(graph) {
+  var g = new Graph();
+  
+  for (var i = 0, v = graph.vertices; i < v; i++) {
+    g.addNode(i.toString());
+  }
+    
+  for (var i = 0, e = graph.edges; i < e; i++){
+    var edge = {};
+    var source = '', target = '', weight = 0;
+    
+    source += graph.edgeList[i][0];
+    target += graph.edgeList[i][1];
+    weight += graph.edgeList[i][2];
+    
+    g.addEdge(source, target, weight);
+  }
+  
+  return g;
+}
+
+</script>
+
+  </body>
+</html>
+

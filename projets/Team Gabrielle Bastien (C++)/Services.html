@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>M&eacute;ga projet super cool!</title>
+
+		<link href='StyleServices.css' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
+
+		<!-- BOOTSTRAP -->
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+		<!-- jQuery library -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<!-- Latest compiled JavaScript -->
+		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+		<script src="springy.js"></script>
+		<script src="springyui.js"></script>
+	</head>
+  
+	<body>
+		<header class="jumbotron" id="header">
+			<p id="sommets" class="p-text">
+				Entrez le nombre de sommets:
+				<input type="text" id="TextBox1" name="NbSommets" style="width: 50px; height: 22px; text-align: center;"></input>
+			</p>
+				
+			<p id="densite" class="p-text">
+				Entrez la densit&eacute; (de 0 &agrave; 100):		
+				<input type="text" id="TextBox2" name="Densite" style="width: 50px; height: 22px; text-align: center;"></input>	
+			</p>
+
+			<p id="shortpath" class="p-text">
+				Entrez le sommet &agrave; tester pour trouver les chemins les plus courts:
+				<input type="text" id="TextBox3" name="ShortPath" style="width: 50px; height: 22px; text-align: center;"></input>
+			</p>
+		</header>
+			<p>
+				<a onclick="Serv1.envoyer()" class="a-btn" id="bouton1">
+					<span class="a-btn-symbol"><img src="roue.png"></span>
+					<span class="a-btn-text">GO!</span> 
+					<span class="a-btn-slide-text">G&eacute;n&eacute;rer le graphe!</span>
+				</a>
+
+				<a onclick="ShortestPath()" class="a-btn" id="bouton2">
+					<span class="a-btn-symbol"><img src="roue.png"></span>
+					<span class="a-btn-text">Shortest Path</span> 
+					<span class="a-btn-slide-text">Plus court chemin</span>
+				</a>
+
+				<a onclick="MST()" class="a-btn" id="bouton3">
+					<span class="a-btn-symbol"><img src="roue.png"></span>
+					<span class="a-btn-text">MST</span> 
+					<span class="a-btn-slide-text">Plus petit arbre</span>
+				</a>
+
+				<a onclick="location.reload();" class="a-btn" id="bouton4">
+					<span class="a-btn-symbol"><img src="roue.png"></span>
+					<span class="a-btn-text">R&eacute;initialiser</span> 
+					<span class="a-btn-slide-text">Recommencer le graphe</span>
+				</a>
+			</p>
+
+			<p id="NonConnecte" class="p-text">Le graphe n'est pas connect&eacute;! Veuillez r&eacute;initialiser.</p>
+			<p><canvas id="GrapheComplet" width="1300" height="700" /></p>
+			<p><canvas id="springyMST" width="650" height="700"/></p>
+			<p id="InfosShortestPath"></p>
+
+			<!-- Javascript -->
+			<script>
+				var Aretes = [];    //Liste des arêtes pour le Graphe Complet
+				var AretesMST = []; //Liste des arêtes pour le Minimum Spanning Tree
+				var Canvas1 = document.getElementById("GrapheComplet");
+	    		var Canvas2 = document.getElementById("springyMST");
+				var Chiffre = 0;    //Nombre d'arêtes dans le Minimum Spanning Tree
+				var Elements = [];  //Liste de paires de sommets
+				var Graph = new Springy.Graph();
+				var GraphMST = new Springy.Graph();				
+				var Ligne1 = [];    //La première ligne renvoyée, qui contient le nombre de sommets et d'arêtes
+				var Lignes = [];    //Liste qui contient les autres lignes renvoyées
+				var LignesMST = []; //Liste qui contient les autres lignes renvoyées pour le MST
+				var LignesShortestPath = [];  //Liste qui contient les autres lignes renvoyées pour le SSSP
+				var Paragraphe = document.getElementById("InfosShortestPath");
+				var Service = 1;    //Variable qui garde en mémoire quel service est en utilisation
+				var Serv1;          //
+				var Serv2;          // Variables pour les WebSockets
+				var Serv3;          //
+				var Sommets = [];   //Liste des sommets pour le Graphe Complet
+				var SommetsMST = [];//Liste des sommets pour le Minimum Spanning Tree
+				var Variable = 0;   //Variable au nom significatif qui permet de lancer le MST qu'une seule fois
+
+				function webchaussette() //Pour n'avoir qu'une seule fonction WebChaussette, on test à chaque fois
+				{                        //le service en cours d'éxécution 
+					if(Service == 1) 
+						this.ws = new WebSocket('ws://localhost:8080/');
+					else if(Service == 2)
+						this.ws = new WebSocket('ws://localhost:8060/');	
+					else if(Service == 3)
+						this.ws = new WebSocket('ws://localhost:8070/');
+
+					this.ws.onopen = function() { };
+	      
+					this.ws.onclose = function() 
+					{
+						if(Service == 1)
+							ConstruireGraph();
+
+						else if(Service == 2)
+							AfficherShortestPath();
+	        				
+	        			else if(Service == 3)
+							ConstruireGraphMST();
+	     			};
+	      
+					this.ws.onmessage = function(event) 
+					{
+						if(Service == 1)
+	        				Lignes.push(event.data);
+
+	        			else if(Service == 2)
+	        				LignesShortestPath += event.data += '\n';
+
+	        			else if(Service == 3)
+	        			{
+	        				LignesMST.push(event.data);
+	        				Chiffre++; //On prend en note le nombre de lignes retournées par le MST
+	        			}
+	       			}
+
+					this.send_data = function(d, d2)
+	      			{
+	      				if(Service == 1)
+	      				{
+	      					this.ws.send(d);
+	        				this.ws.send(d2);
+	      				}
+
+	      				else if(Service == 2)
+	      					this.ws.send(d);
+	      			}
+
+					this.envoyer = function()
+	      			{
+	      				if(Service == 1)
+		          			this.send_data(document.getElementById("TextBox1").value, document.getElementById("TextBox2").value);
+
+		          		else if(Service == 2)
+		          			this.send_data(document.getElementById("TextBox3").value, 42);
+	     			}                                //Comme la fonction prend deux paramètres, on envoie une 
+	                                                 //variable inutile
+					this.fermer = function()
+	      			{
+	          			this.ws.close();
+	      			}
+				}
+
+				function ConstruireGraph()
+				{
+					Ligne1 = Lignes[1].split(" "); //On prend la première ligne renvoyée (Ligne1[0] = NbSommets)
+                                                                                       //(Ligne1[1] = NbArêtes)
+			       	for(var i = 0; i < Ligne1[0]; i++)
+			       		Sommets.push(i.toString()); //On ajoute les sommets dans la liste
+			        	
+			        for(var i = 0; i < Ligne1[1]; i++)
+		        	{
+		        	//On ajoute les arêtes à la liste avec comme attributs chaque sommets, pas de direction, le poids et une couleur aléatoire
+		        		Elements = Lignes[i+2].split(" ");
+		        		Aretes.push([Elements[0].toString(), Elements[1].toString(),                                 {directional: false, label: Elements[2].toString(), color: RandomCouleur()}]);
+		        	}
+
+					Graph.loadJSON({"nodes": Sommets, "edges": Aretes});
+
+					if (Service != 3)
+					{
+						//On change le display de certains éléments lorsque le graphe est affiché
+						document.getElementById("bouton1").style.display='none';
+						document.getElementById("bouton2").style.display='inline-block';
+						document.getElementById("bouton3").style.display='inline-block';
+						document.getElementById("bouton4").style.display='inline-block';
+						document.getElementById("densite").style.display='none';
+						document.getElementById("sommets").style.display='none';
+						document.getElementById("shortpath").style.display='inline';
+
+						if(Lignes[i+2] == "2000")//"2000" est la valeur retournée si le graphe n'est pas connecté.
+			        	{						 //Dans ce cas là, on change encore le display de d'autres éléments
+							document.getElementById("bouton2").style.display='none';
+							document.getElementById("bouton3").style.display='none';
+							document.getElementById("shortpath").style.display='none';
+							document.getElementById("NonConnecte").style.display='inline';
+			        	}
+			        }
+				}
+
+				function ConstruireGraphMST()
+				{	
+					var FaitPartieMST = false; //Vaut vrai si l'arête actuelle fait partie de la liste
+											   //d'arêtes constituant le MST
+			       	for(var i = 0; i < Ligne1[0]; i++)
+			       		SommetsMST.push(i.toString()); //On ajoute les sommets à la liste
+			        	
+			        for(var i = 0; i < Ligne1[1]; i++)
+		        	{
+		        		Elements = Lignes[i+2].split(" ");   //Pour chaque arêtes du graphe complet, on
+		        		for(var j = 0; j < Chiffre; j++)     //teste si celle-ci fait partie de la liste
+		        			if(Lignes[i+2] == LignesMST[j])  //d'arêtes formant le Minimum Spanning Tree
+		        				FaitPartieMST = true
+
+		        		if(FaitPartieMST)                    //Si c'est le cas, on l'ajoute à la liste d'arêtes
+		        			AretesMST.push([Elements[0].toString(), Elements[1].toString(),                          {directional: false, label: Elements[2].toString(), color: '#000000'}]);
+
+		        		FaitPartieMST = false;
+		        	}
+
+					GraphMST.loadJSON({"nodes": SommetsMST, "edges": AretesMST});
+				}
+
+				function RandomCouleur()
+				{
+					//On choisi 6 caractères aléatoires entre 0 et E pour avoir une couleur random
+					var Choix = '0123456789ABCDE'.split('');
+	    			var Couleur = '#';
+	    			
+	    			for (var j = 0; j < 6; j++ ) 
+	        			Couleur += Choix[Math.floor(Math.random() * 15)];
+	        		return Couleur;
+	    		}
+
+	    		function ShortestPath() //Si le bouton "Shortest Path" est cliqué
+	    		{
+	    			Service = 2;
+	    			Serv2 = new webchaussette();
+	    			setTimeout(FonctionQuiLaisseWSOuvrir, 100); //On attend un peu sinon ça ne rentrait
+	    														//pas dans le OnMessage du WebSocket...
+	    			document.getElementById("InfosShortestPath").innerHTML = '';
+	    			LignesShortestPath = []; //On réinitialise la liste pour pouvoir réutiliser le SSSP
+	    		}
+
+	    		function AfficherShortestPath() //Affiche tous les chemins les plus courts du sommet voulu
+	    		{
+	    			Canvas2.style.display = 'none';
+        			Paragraphe.style.display = 'inline-block';
+        			Canvas1.style.float = 'left';
+	    			Canvas1.width = 650;
+	    			LignesShortestPath = LignesShortestPath.replace(/\n/g, "<br/>");
+        			Paragraphe.innerHTML = LignesShortestPath;
+	    		}
+
+	    		function MST() //Si le bouton "MST" est cliqué
+	    		{
+	    			Canvas2.style.display = 'inline-block';
+	    			Paragraphe.style.display = 'none';
+	    			Canvas1.style.float = 'left';
+	    			Canvas2.style.float = 'right';
+	    			Canvas1.width = 650;
+	    			
+	    			if(Variable == 0) //On n'entre qu'une seule fois, sinon cela refait un graphe et
+	    			{                 //Ils s'empilent tous ensemble
+	    				Service = 3;
+						Serv3 = new webchaussette();
+						Serv3.envoyer();
+						Variable++;
+	    			}
+	    		}
+
+	    		function FonctionQuiLaisseWSOuvrir()
+	    		{
+	    			Serv2.envoyer();
+	    		}
+
+				Serv1 = new webchaussette();
+
+				jQuery(function()
+				{
+	  				var springy = window.springy = jQuery('#GrapheComplet').springy({graph: Graph});
+	  				var springyMST = window.springy = jQuery('#springyMST').springy({graph: GraphMST});
+				});	
+			</script>	
+	</body>
+</html>

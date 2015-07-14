@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+	<!-- Pour que ca marche :
+		+ start php -S localhost:80
+		+ start websocketd port=8080 java -jar Graph.jar 5 50 -->
+	<head>
+		<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="test.css" rel="stylesheet">
+	
+		<meta charset="utf-8" />
+		<title>Projet Web</title>
+		
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+		<script src="springy.js"></script>
+		<script src="springyui.js"></script>
+	</head>
+
+	<body>
+		<header>Projet Final : Graph Theory</header>
+		
+		<div class="formulaire">
+			<form method="GET">
+				Nombre de sommets : <br>
+				<input id="sommets" type="text" name="nbSommets">
+				<br>
+				
+				densite : <br>
+				<input id="densite" type="text" name="densite">
+				<br><br>
+				
+				<input type="button" onclick="generate()" value="Generer Graphe">
+				<input type="button" onclick="sssp()" value="SSSP">
+				<input type="button" onclick="mst()" value="MST">
+				
+			</form>
+		</div>
+		
+		<aside>
+			<div id="shortestPath" class="sssp"></div>
+		</aside>
+		
+		<div class="graphe">
+			<canvas id="graphe" width="950" height="450" />
+		</div>
+		
+		<footer>
+			<canvas id="mst" width="1000" height="450" />
+		</footer>
+		
+		<script>
+			this.json = 0;
+		
+			function generate() {
+				this.graph = new Springy.Graph();
+				this.springy = 0;
+			
+				var nbSommets = document.getElementById('sommets').value;
+				var densite = document.getElementById('densite').value;
+				
+				var wsGraph = new WebSocket('ws://localhost:8080');
+								
+				wsGraph.onopen = function() {
+					console.log("Opening connection");
+
+					wsGraph.send(nbSommets + " " + densite);
+				};
+				wsGraph.onclose = function() {
+					console.log("Closing connection");
+				};
+				wsGraph.onmessage = function(event) {
+					console.log("Incoming data");
+					console.log(event.data);
+					json = JSON.parse(event.data);
+					graph.loadJSON(json);
+					springy = jQuery('#graphe').springy({
+						graph: graph
+					});
+				};
+			}
+			
+			function sssp() {
+				var shortestPath = document.querySelector("#shortestPath");
+				shortestPath.innerHTML = "";
+				
+				var wsSSSP = new WebSocket('ws://localhost:8081');
+				
+				wsSSSP.onopen = function() {
+					console.log("Opening connection");
+					console.log(JSON.stringify(json));
+					wsSSSP.send(JSON.stringify(json));
+				};
+				wsSSSP.onclose = function() {
+					console.log("Closing connection");
+				};
+				wsSSSP.onmessage = function(event) {
+					console.log("Incoming data");
+					
+					var test = (event.data);
+					shortestPath.innerHTML += test + "<br>";
+					console.log(test);
+				};
+			}
+			
+			function mst() {
+				this.graph = new Springy.Graph();
+				this.springy = 0;
+			
+				this.isDrawed = 0;
+			
+				var wsGraph = new WebSocket('ws://localhost:8082');
+								
+				wsGraph.onopen = function() {
+					console.log("Opening connection");
+					console.log(JSON.stringify(json));
+					wsGraph.send(JSON.stringify(json));
+				};
+				wsGraph.onclose = function() {
+				if(isDrawed == 0) {
+					isDrawed = 1;
+				} else {
+					isDrawed = 0;
+				}
+					console.log("Closing connection");
+				};
+				wsGraph.onmessage = function(event) {
+					if(isDrawed != 0) {
+						console.log("!= ZERO");
+						document.querySelector("#mst").clearRect(0, 0, 1000, 1000);
+					} else {
+						console.log("Incoming data");
+						console.log(event.data);
+						json = JSON.parse(event.data);
+						graph.loadJSON(json);
+						springy = jQuery('#mst').springy({
+							graph: graph
+						});
+					}
+				};
+			}
+		</script>
+	</body>
+</html>
