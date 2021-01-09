@@ -4,7 +4,7 @@ Bienvenue sur la page du cours du 8GIF128 pour Hiver 2015, Conception de sites w
 Équipes
 ===========
 
-1. Guillaume Merindol,Cyril Chemla,Khalis Chalabi,Kevin Louzoun,Mathilde Laplaze
+1. Guillaume Merindol,Cyril Chemla,Khalis Chalabi,Kevin Lzn,Mathilde Laplaze
 2. Tom Canac, Arthur Roussel, Jeremy Spieldenner et Bastien Courtois
 3. Simon Côté,Maryssa Bouchard,Mathieu Naud,Steven Simard,Gabrielle Bastien
 4. Louis Jacquelin, Valentin Lambert, Bastien Gadoury
